@@ -17,12 +17,16 @@
         groups: web_user
         is_root: false
 
-    apache_global_vhost_settings:
-      <Directory /var/www/html>
-        Options Indexes FollowSymLinks
-        AllowOverride None
-         Require all granted
-      </Directory>
+    apache_vhosts:
+      - servername: "localhost"
+        documentroot: "/var/www/html"
+        port: 8080
+        extra_parameters: |
+          <Directory /var/www/html>
+            Options Indexes FollowSymLinks
+            AllowOverride None
+            Require all granted
+          </Directory>
 
   roles:
     - role: user_management
