@@ -19,18 +19,21 @@ pipeline {
             steps {
                 sh 'ansible-galaxy collection install ansible.posix'
                 sh 'chmod -R 755 .'
+                sh 'echo $VAULT_PASS > .vault_pass'
             }
         }
 
         stage('Lint: All') {
             steps {
-                sh "ansible-playbook -i ${INVENTORY} setup_env.yml --syntax-check"
-                sh "ansible-playbook -i ${INVENTORY} site.yml --syntax-check"
-                script {
-                    try {
-                        sh 'ansible-lint setup_env.yml site.yml'
-                    } catch (Exception e) {
-                        echo "Linting issues found."
+                withEnv(['ANSIBLE_VAULT_PASSWORD_FILE=.vault_pass']) {
+                    sh "ansible-playbook -i ${INVENTORY} setup_env.yml --syntax-check"
+                    sh "ansible-playbook -i ${INVENTORY} site.yml --syntax-check"
+                    script {
+                        try {
+                            sh 'ansible-lint setup_env.yml site.yml'
+                        } catch (Exception e) {
+                            echo "Linting issues found."
+                        }
                     }
                 }
             }
