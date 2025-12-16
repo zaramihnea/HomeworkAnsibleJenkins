@@ -1,7 +1,7 @@
 ---
 - name: Final deployment
   hosts: webservers
-  become: yes
+  become: true
 
   vars:
     apache_listen_port: 8080
@@ -17,7 +17,7 @@
         groups: web_user
         is_root: false
 
-    apache_gloal_vhost_settings:
+    apache_global_vhost_settings:
       <Directory /var/www/html>
         Options Indexes FollowSymLinks
         AllowOverride None
@@ -30,7 +30,7 @@
 
   tasks:
     - name: Deploy the html template
-      template:
+      ansible.builtin.template:
         src: templates/index.html.j2
         dest: /var/www/html/index.html
         owner: web_worker
@@ -39,7 +39,7 @@
       notify: restart apache
 
   handlers:
-    - name: restart apache
-      service:
+    - name: Restart apache
+      ansible.builtin.service:
         name: apache2
         state: restarted

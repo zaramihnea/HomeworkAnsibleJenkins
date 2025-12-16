@@ -1,0 +1,5 @@
+exclude_paths:
+  - roles/geerlingguy.apache/
+
+skip_list:
+  - yaml[octal-values]  # Often complains about '0644' vs 0644

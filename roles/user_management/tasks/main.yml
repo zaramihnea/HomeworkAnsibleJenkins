@@ -1,7 +1,7 @@
 ---
 # tasks file for ./roles/user_management
 - name: Ensures group exists
-  group:
+  ansible.builtin.group:
     name: "{{ item }}"
     state: present
   loop:
@@ -9,20 +9,20 @@
     - web_user
 
 - name: Create user from the list
-  user:
+  ansible.builtin.user:
     name: "{{ item.username }}"
     groups: "{{ item.groups }}"
     shell: /bin/bash
-    append: yes
-    create_home: yes
+    append: true
+    create_home: true
     state: present
   loop: "{{ users_list }}"
 
 - name: Passwordless sudo config
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sudoers.d/{{ item.username }}
     state: present
-    create: yes
+    create: true
     mode: '0440'
     line: "{{ item.username }} ALL=(ALL) NOPASSWD: ALL"
     validate: 'visudo -cf %s'
@@ -30,7 +30,7 @@
   when: item.is_root | default(false)
 
 - name: Add auth keys from vault
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.username }}"
     key: "{{ ssh_public_key }}"
     state: present
