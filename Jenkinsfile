@@ -43,6 +43,8 @@ pipeline {
         stage('Plan: Setup') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
+                    sh 'mkdir -p ~/.ssh'
+                    sh 'ssh-keygen -y -f "$SSH_KEY_FILE" > ~/.ssh/id_rsa.pub'
                     sh "ansible-playbook -i ${INVENTORY} setup_env.yml --private-key \"$SSH_KEY_FILE\" --check"
                 }
             }
