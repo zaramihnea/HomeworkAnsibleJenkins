@@ -42,7 +42,7 @@ pipeline {
         stage('Plan: Setup') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} setup_env.yml --private-key \$SSH_KEY_FILE --check"
+                    sh "ansible-playbook -i ${INVENTORY} setup_env.yml --private-key \"$SSH_KEY_FILE\" --check"
                 }
             }
         }
@@ -50,7 +50,7 @@ pipeline {
         stage('Deploy: Setup') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} setup_env.yml --private-key \$SSH_KEY_FILE"
+                    sh "ansible-playbook -i ${INVENTORY} setup_env.yml --private-key \"$SSH_KEY_FILE\""
                 }
             }
         }
@@ -58,7 +58,7 @@ pipeline {
         stage('Plan: Users & App') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \$SSH_KEY_FILE --check"
+                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\" --check"
                 }
             }
         }
@@ -66,7 +66,7 @@ pipeline {
         stage('Deploy: Users & App') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \$SSH_KEY_FILE"
+                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\""
                 }
             }
         }
@@ -74,7 +74,7 @@ pipeline {
         stage('Verify') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible -i ${INVENTORY} webservers -m uri -a 'url=http://localhost:8080 return_content=yes status_code=200' --private-key \$SSH_KEY_FILE"
+                    sh "ansible -i ${INVENTORY} webservers -m uri -a 'url=http://localhost:8080 return_content=yes status_code=200' --private-key \"$SSH_KEY_FILE\""
                 }
             }
         }
