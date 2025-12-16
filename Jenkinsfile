@@ -61,7 +61,9 @@ pipeline {
         stage('Plan: Users & App') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\" --check"
+                    withEnv(['ANSIBLE_VAULT_PASSWORD_FILE=.vault_pass']) {
+                        sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\" --check"
+                    }
                 }
             }
         }
@@ -69,7 +71,9 @@ pipeline {
         stage('Deploy: Users & App') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'SSH_KEY_FILE')]) {
-                    sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\""
+                    withEnv(['ANSIBLE_VAULT_PASSWORD_FILE=.vault_pass']) {
+                        sh "ansible-playbook -i ${INVENTORY} site.yml --private-key \"$SSH_KEY_FILE\""
+                    }
                 }
             }
         }
