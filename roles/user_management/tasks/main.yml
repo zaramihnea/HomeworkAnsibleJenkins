@@ -1,0 +1,37 @@
+---
+# tasks file for ./roles/user_management
+- name: Ensures group exists
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - web_admin
+    - web_user
+
+- name: Create user from the list
+  user:
+    name: "{{ item.username }}"
+    groups: "{{ item.groups }}"
+    shell: /bin/bash
+    append: yes
+    create_home: yes
+    state: present
+  loop: "{{ users_list }}"
+
+- name: Passwordless sudo config
+  lineinfile:
+    path: /etc/sudoers.d/{{ item.username }}
+    state: present
+    create: yes
+    mode: '0440'
+    line: "{{ item.username }} ALL=(ALL) NOPASSWD: ALL"
+    validate: 'visudo -cf %s'
+  loop: "{{ users_list }}"
+  when: item.is_root | default(false)
+
+- name: Add auth keys from vault
+  authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ ssh_public_key }}"
+    state: present
+  loop: "{{ users_list }}"

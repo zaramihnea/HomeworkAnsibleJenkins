@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Ansible homework </title>
+</head>
+<body>
+	<h1> Welcome </h1>
+	<p> this is a server that is running on port: {{ apache_port_setting }} </p>
+	<h3> Authorised users: </h3>
+	<ul>
+		{% for user in users_list %}
+			<li>
+
+				User: {{ user.username }}
+				{% if user.is_root|default(false) %}
+					(<strong>Admin</strong>)
+				{% else %}
+					(Standars user)
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+
+	<p><em>Deployed by Ansible on {{ ansible_date_time.date }}</em></p>
+</body>
+</html>

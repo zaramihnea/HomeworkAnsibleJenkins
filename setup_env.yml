@@ -1,0 +1,36 @@
+---
+- name: Setup ansible user and access
+  hosts: webservers
+  become: true
+
+  vars:
+    created_user: ansible
+    ansible_group: devops
+
+  tasks:
+    - name: Create devops group
+      ansible.builtin.group:
+        name: "{{ ansible_group }}"
+        state: present
+    - name: Create the ansible user and add to devops group
+      ansible.builtin.user:
+        name: "{{ created_user }}"
+        group: "{{ ansible_group }}"
+        shell: /bin/bash
+        create_home: true
+        state: present
+
+    - name: Set passwordless sudo for devops group
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/devops
+        state: present
+        create: true
+        mode: '0440'
+        line: '%devops ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: Deploy ssh key to ansible users
+      ansible.posix.authorized_key:
+        user: "{{ created_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

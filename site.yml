@@ -1,0 +1,45 @@
+---
+- name: Final deployment
+  hosts: webservers
+  become: yes
+
+  vars:
+    apache_listen_port: 8080
+    apache_user: web_worker
+    apache_port_setting: 8080
+
+    users_list:
+      - username: my_admin
+        groups: sudo,web_admin
+        is_root: true
+
+      - username: web_worker
+        groups: web_user
+        is_root: false
+
+    apache_gloal_vhost_settings:
+      <Directory /var/www/html>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+         Require all granted
+      </Directory>
+
+  roles:
+    - role: user_management
+    - role: geerlingguy.apache
+
+  tasks:
+    - name: Deploy the html template
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+        owner: web_worker
+        group: web_user
+        mode: '0644'
+      notify: restart apache
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
