@@ -20,6 +20,7 @@ pipeline {
                 sh 'ansible-galaxy collection install ansible.posix'
                 sh 'chmod -R 755 .'
                 sh 'echo $VAULT_PASS > .vault_pass'
+                sh 'chmod 600 .vault_pass'
             }
         }
 
